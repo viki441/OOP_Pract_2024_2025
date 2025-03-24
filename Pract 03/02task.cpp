@@ -8,6 +8,7 @@ int findLength(std::ifstream& file) {
         if (ch == ' ' || ch == '\n') {
             count++;
         }
+        //for last element, to count correctly
         ch = file.peek();
         if (ch == EOF) {
             count++;
