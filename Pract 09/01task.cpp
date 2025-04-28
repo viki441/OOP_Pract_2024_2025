@@ -1,42 +1,114 @@
-
 #include <iostream>
-int* makeArray(int n) {
-    int* arr = new int[n];
-    return arr;
-}
-void inputNumbersInArray(int* arr, int n) {
-    std::cout << "Let's assign values to the array!\n";
-    for (int i = 0; i < n; i++) {
-        int element;
-        std::cout << "Enter an element: \n";
-        std::cin >> element;
-        //adding watch to monitor the inputs in the dynamic int array
-        arr[i] = element;
-    }
-}
-int countMatchingElements(const int *arr, int size, bool (*predicate)(int)) {
-    int count = 0;
-    for (int i = 0; i < size; i++) {
-        if (predicate(arr[i])) {
-            count++;
-        }
-    }
-    return count;
-}
-int main()
+#include <cmath>
+#include <fstream> 
+#include <stdexcept>
+//x++ - lvalue -> A operator++(int);
+//++x - rvalue -> A& operator++(); 
+class NVector
 {
-    int n;
-    std::cout << "How many numbers are we using for our array? \n";
-    std::cin >> n;
-    int* arrayNumbers = makeArray(n);
-    inputNumbersInArray(arrayNumbers , n);
+private:
+	double x = 0;
+	double y = 0;
 
+public:
 
-    //type (pointer to function) (arguments for f) = [capture list](parameter) -> type for return {body}
-    // we have a pointer to a function and inside it a lambda function
-    bool (*isEven)(int) = [](int num) -> bool { return num % 2 == 0; };
+	NVector() = default;
+	NVector(double x, double y) : x(x), y(y) {}
 
-    int result = countMatchingElements(arrayNumbers, n, isEven);
-    std::cout << "Count of even numbers: " << result << std::endl;
-    delete[] arrayNumbers;
+	//v+v
+	NVector operator+(const NVector& v)
+	{
+		return NVector(x + v.x, y + v.y);
+	}
+	//v-v
+	NVector operator-(const NVector& v)
+	{
+		return NVector(x - v.x, y + v.y);
+	}
+	//v*num
+
+	NVector operator*(int num)
+	{
+		return NVector(x * num, y * num);
+	}
+
+	//return length
+	double operator() () const
+	{
+		return std::sqrt(x * x + y * y);
+	}
+
+	//return random value
+	double operator[](int ind) const
+	{
+		if (ind == 0) return x;
+		else if (ind == 1) return y;
+		else throw std::out_of_range("Index is out of range!");
+	}
+
+	//files
+	friend std::ofstream& operator<<(std::ofstream& writeFile, const NVector& v);
+	friend std::ifstream& operator>>(std::ifstream& readFile, NVector& v);
+	
+
+	void display()
+	{
+		std::cout << x << " " << y;
+	}
+
+};
+std::ofstream& operator<<(std::ofstream& writeFile, const NVector& v)
+{
+	writeFile << v.x;
+	return writeFile;
+}
+std::ifstream& operator>>(std::ifstream& readFile, NVector& v)
+{
+	readFile >> v.x;
+	return readFile;
+}
+
+int main() {
+
+	NVector v1(4, 3);
+	NVector v2(1.5, 3.4);
+	NVector v3 = v1 + v2;
+	NVector v4 = v1 - v2;
+	NVector v5 = v1 * 3;
+	v5.display();
+
+	double length = v1();
+	std::cout << length;
+
+	try
+	{
+		int getX = v1[1];
+		std::cout << getX;
+	}
+	catch (const std::out_of_range& e)
+	{
+		std::cout << "Error: " << e.what();
+	}
+
+	//file - write
+	std::ofstream file("output.txt");
+	if (file.is_open()) {
+		file << v1;
+		file.close();
+	}
+	else {
+		std::cerr << "Unable to open file\n";
+	}
+	file.close();
+
+	//file read 
+	std::ifstream file1("input.txt");
+	if (file1.is_open()) {
+		file1 >> v1;
+		file1.close();
+	}
+	else {
+		std::cerr << "Unable to open file\n";
+	}
+
 }
