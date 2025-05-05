@@ -2,9 +2,9 @@
 
 struct Student {
     int facultyNum;
-    float averageGrade;
+    double averageGrade;
 
-    Student(int number = 0, float grade = 0.0f)
+    Student(int number = 0, double grade = 0.0)
         : facultyNum(number), averageGrade(grade) {}
 
     void display() const {
@@ -16,19 +16,19 @@ struct Student {
 struct Group {
     int numStudents;
     Student* students;
-    float averageGroupGrade;
+    double averageGroupGrade;
 
-    Group(int size) : numStudents(size), averageGroupGrade(0.0f) {
+    Group(int size) : numStudents(size), averageGroupGrade(0.0) {
         students = new Student[size];
     }
 
     ~Group() {
-        delete[] students; 
+        delete[] students;
     }
 };
 
 void createGroup(Group& group) {
-    float totalGrade = 0.0f;
+    double totalGrade = 0.0;
     for (int i = 0; i < group.numStudents; ++i) {
         std::cout << "Enter information for student " << i + 1 << ":\n";
         std::cout << "Enter faculty number: ";
@@ -41,7 +41,7 @@ void createGroup(Group& group) {
     group.averageGroupGrade = totalGrade / group.numStudents;
 }
 
-int countScholarshipStudents(const Group& group, float minGrade) {
+int countScholarshipStudents(const Group& group, double minGrade) {
     int count = 0;
     for (int i = 0; i < group.numStudents; ++i) {
         if (group.students[i].averageGrade >= minGrade) {
@@ -51,11 +51,11 @@ int countScholarshipStudents(const Group& group, float minGrade) {
     return count;
 }
 
-void createScholars(Group& scholars, const Group& group, float minGrade) {
+void createScholars(Group& scholars, const Group& group, double minGrade) {
     int count = 0;
     for (int i = 0; i < group.numStudents; ++i) {
         if (group.students[i].averageGrade >= minGrade) {
-            scholars.students[count] = group.students[i];  
+            scholars.students[count] = group.students[i];
             count++;
         }
     }
@@ -64,7 +64,7 @@ void createScholars(Group& scholars, const Group& group, float minGrade) {
 void displayScholars(const Group& scholars) {
     std::cout << "\nList of students who receive scholarships:\n";
     for (int i = 0; i < scholars.numStudents; ++i) {
-        scholars.students[i].display(); 
+        scholars.students[i].display();
     }
 }
 
@@ -78,7 +78,7 @@ int main() {
 
     std::cout << "\nAverage grade of the group: " << group.averageGroupGrade << "\n";
 
-    float minScholarshipGrade;
+    double minScholarshipGrade;
     std::cout << "Enter minimum grade for a scholarship: ";
     std::cin >> minScholarshipGrade;
 
@@ -93,4 +93,4 @@ int main() {
     else {
         std::cout << "No students qualify for a scholarship.\n";
     }
-   }
+}
