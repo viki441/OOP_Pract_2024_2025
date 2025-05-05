@@ -1,11 +1,10 @@
-
 #include <iostream>
 int countOfDigits(int n, int count) {
     if (n == 0) {
         return count;
     }
     count += n % 10;
-    countOfDigits(n / 10, count);
+    return countOfDigits(n / 10, count);
 
 }
 int main()
