@@ -1,11 +1,9 @@
-
 #include <iostream>
 int sumOfNumbers(int n) {
     if (n == 0) {
         return n;
     }
-    n = n + sumOfNumbers(n - 1);
-
+    return n + sumOfNumbers(n - 1);
 }
 int main()
 {
