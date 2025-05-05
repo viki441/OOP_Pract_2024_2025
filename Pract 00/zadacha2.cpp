@@ -1,4 +1,3 @@
-
 #include <iostream>
 long long isNPart(long long n, long long k) {
     if (n == 0) {
@@ -7,7 +6,7 @@ long long isNPart(long long n, long long k) {
     if (n % 10 == k) {
         return 1;
     }
-    isNPart(n/10, k);
+       return isNPart(n/10, k);
 
 }
 int main()
