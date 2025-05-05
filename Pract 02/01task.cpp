@@ -1,129 +1,152 @@
 #include <iostream>
 #include <cstring>
+#pragma warning (disable : 4996)
+#include <cctype>
+namespace Constants 
+{
+    const int SIZE = 50;
+    const int NUM_BOOKS = 10;
+}
 
 struct Book {
-    static const int SIZE = 50;
-    char name[SIZE] = "none";
-    char author[SIZE] = "none";
-    enum GenreType { NOVEL, POETRY, HISTORICAL, OTHERS } selectedGenre;
-    struct Genre {
-        int novel = 9;
-        int poetry = 7;
-        int historical = 0;
-        int others = 23;
-    } genre;
+    char name[Constants::SIZE] = "";
+    char author[Constants::SIZE] = "";
+    enum class GenreType 
+    { 
+        NOVEL, 
+        POETRY, 
+        HISTORICAL, 
+        OTHERS 
+    } selectedGenre;
 
     int amount = 0;
-
-    int getGenreAmount() const {
-        switch (selectedGenre) {
-        case NOVEL:
-            return genre.novel;
-        case POETRY:
-            return genre.poetry;
-        case HISTORICAL:
-            return genre.historical;
-        case OTHERS:
-            return genre.others;
-        default:
-            return 0;
-        }
-    }
 };
-//note: individual books, not really engaged with the amount of each book
-struct Library {
-    static const short NUM_BOOKS = 10;
-    Book books[NUM_BOOKS];
+
+struct Library 
+{    
+    Book books[Constants::NUM_BOOKS];
     short currentBookCount = 0;
 
+
 };
 
+bool isBookInLibrary(Book& book, Library& libraryShelf)
+{
+    for (int i = 0; i < libraryShelf.currentBookCount; ++i)
+    {
+        if (std::strcmp(book.name, libraryShelf.books[i].name) == 0)
+        {
+            return true;
+        }
+      
+    }
+    return false;
+}
+void addBook(Book& book, Library& libraryShelf)
+{
+    //check limit
+    if (libraryShelf.currentBookCount == Constants::NUM_BOOKS - 1)
+    {
+        std::cout << "Limit is reached. Can't add a book.\n";
+        return;
+    }
+    //check if book is already there
+    else if (isBookInLibrary(book, libraryShelf)) 
+    {
+        std::cout << "Can't add the same book twice.\n";
+        return;
+    }
+    
+    //if book is not available
+    else if (book.amount == 0) 
+    {
+        std::cout << "Book is not available. Can't add the book.\n";
+        return;
+    }
+    libraryShelf.books[libraryShelf.currentBookCount] = book;
+    libraryShelf.currentBookCount++;
+}
 
-void addBook(Library& library, Book* book) {
-    if (library.currentBookCount < Library::NUM_BOOKS) {
-        library.books[library.currentBookCount] = *book; 
-        library.currentBookCount++;
+void getBookByName(Book& book, Library& libraryShelf)
+{
+    if (!isBookInLibrary(book, libraryShelf))
+    {
+        std::cout << "No such book.\n";
+        return;
     }
-    else {
-        std::cout << "Library is full!" << std::endl;
+    else if (book.amount == 0)
+    {
+        std::cout << "Book is out of stock.\n";
+        return;
     }
+    std::cout << "Book taken\n";
+    book.amount--;
+    
 }
-int isReal(Library& library, Book* book) {
-    for (int i = 0; i < library.currentBookCount; i++) {
-        if (std::strcmp(book->name, library.books[i].name) == 0) {
-            return i;
-        }
-    }
-    return -1;
 
-}
-void getBook(Library& library, Book* book) {
-    //check if it exists
-    int realBook = isReal(library, book);
-    //check for amount
-    if (realBook > -1) {
-        if (library.books[realBook].amount > 0) {
-            library.books[realBook].amount -= 1;
-            std::cout << "You have 30 days to return this book.\n";
-        }
-        else {
-            std::cout << "This book is already taken! Sorry!\n";
-        }
-    }
-    else {
-        std::cout << "Book doesn't exists.\n";
-    }
-}
-void giveBook(Library& library, Book* book) {
-    //check if it exists
-    int realBook = isReal(library, book);
-    if (realBook > -1) {
-        library.books[realBook].amount += 1;
-        std::cout << "Thanks for returning this totaly existing book!\n";
+void returnBookByName(Book& book, Library& libraryShelf)
+{
+    if (isBookInLibrary(book, libraryShelf))
+    {
+        std::cout << "Book returned.\n";
+        book.amount++;
+        return;
     }
     else {
         char answer;
-        std::cout << "You are returning a book that's not registered!\nDo you want to donate this book: y/n?\n";
+        std::cout << "This is a new book. Would you like make a donation?: Y/N\n";
         std::cin >> answer;
-        if (answer == 'y') {
-            addBook(library, book);
-        } 
+        answer = std::tolower(static_cast<unsigned char>(answer));
+
+        if (answer == 'y')
+        {
+            Book newBook;
+            std::strcpy(newBook.name, book.name);
+            std::strcpy(newBook.author, book.author);
+            newBook.selectedGenre = book.selectedGenre;
+            newBook.amount = book.amount;
+            addBook(newBook, libraryShelf);
+        }
+        else
+        {
+            std::cout << "Book not added.\n";
+        }
+    }
+
+}
+//for printning
+const char* genreToString(Book::GenreType genre) {
+    switch (genre) {
+    case Book::GenreType::NOVEL: return "Novel";
+    case Book::GenreType::POETRY: return "Poetry";
+    case Book::GenreType::HISTORICAL: return "Historical";
+    case Book::GenreType::OTHERS: return "Others";
+    default: return "Unknown";
     }
 }
 
-void displayBooks(const Library& library) {
-    for (int i = 0; i < library.currentBookCount; i++) {
-        std::cout << "Book " << i + 1 << ": "
-            << library.books[i].name << " by "
-            << library.books[i].author
-            << ", Genre: " << library.books[i].selectedGenre
-            << ", Amount: " << library.books[i].amount << std::endl;
+void printAllBooksInLibrary(Library& libraryShelf)
+{
+    for (int i = 0; i < libraryShelf.currentBookCount; ++i)
+    {
+        std::cout << "Book: " << i + 1<< std::endl;
+        std::cout << "Name: " << libraryShelf.books[i].name << std::endl;
+        std::cout << "Author: " << libraryShelf.books[i].author << std::endl;
+        std::cout << "Genre: " << genreToString(libraryShelf.books[i].selectedGenre) << std::endl;
+        std::cout << "Amount: " << libraryShelf.books[i].amount << std::endl;
+
     }
 }
-
-
 int main() {
-    Book* book1 = new Book{ "I cannot make this shit up","viki", Book::NOVEL };
-    Book* book2 = new Book{ "Historical Chronicles","viki", Book::HISTORICAL };
-    Book* book4 = new Book{ "The Incredible Misadventures of Flapjack", "unknown", Book::NOVEL };
+    Library libraryShelf1;
+    Book book1 { "I cannot make this shit up","viki", Book::GenreType::NOVEL, 10 };
+    Book book2 { "Historical Chronicles","viki", Book::GenreType::HISTORICAL , 0};
+    Book book3 { "The Incredible Misadventures of Flapjack", "unknown", Book::GenreType::NOVEL, 12 };
 
-    book1->amount = book1->getGenreAmount();
-    book2->amount = book2->getGenreAmount();
-    book4->amount = book4->getGenreAmount();
+    addBook(book1, libraryShelf1);
+    getBookByName(book1, libraryShelf1);
+    returnBookByName(book3, libraryShelf1);
+    printAllBooksInLibrary(libraryShelf1);
 
-    Library library;
 
-    addBook(library, book1);
-    addBook(library, book2);
-
-    getBook(library, book1);
-    giveBook(library, book4);
-
-    displayBooks(library);
-    
-    //?? can't find a way to delete
-    /*since it's a small program, there won't be a problem to let the program delete
-    the used dynamic memory after the program ends...*/
-
-    
 }
