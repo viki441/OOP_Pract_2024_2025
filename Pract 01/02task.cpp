@@ -1,4 +1,6 @@
 #include <iostream>
+#include <algorithm>
+
 int* makeArray(int n) {
     int* arr = new int[n];
     return arr;
@@ -8,8 +10,7 @@ void inputNumbersInArray(int* arr, int n) {
     for (int i = 0; i < n; i++) {
         int element;
         std::cout << "Enter an element: \n";
-        std::cin >> element;
-        arr[i] = element;
+        std::cin >> arr[i];
     }
 }
 void selectionSort(int* arr, int n) {
@@ -20,9 +21,7 @@ void selectionSort(int* arr, int n) {
                 minIndex = j;
             }
         }
-        int temp = arr[i];
-        arr[i] = arr[minIndex];
-        arr[minIndex] = temp;
+        std::swap(arr[i], arr[minIndex]);
     }
 }
 
@@ -35,7 +34,7 @@ int& binarySearchFirstMatch(int arr[], int size, bool (*predicate)(int)) {
         int mid = left + (right - left) / 2;
 
         if (predicate(arr[mid])) {
-            result = &arr[mid]; 
+            result = &arr[mid];
             right = mid - 1;
         }
         else {
