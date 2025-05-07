@@ -4,6 +4,7 @@
 #include <stdexcept>
 #include <cstdlib>
 #include <ctime>
+
 //x++ - lvalue -> A operator++(int);
 //++x - rvalue -> A& operator++(); 
 /*
@@ -16,7 +17,7 @@ private:
 	int rows = 2;
 	int cols = 2;
 	int** matrix;
-	
+
 	//for the matrix
 	void freeDynamic()
 	{
@@ -76,7 +77,7 @@ public:
 			for (int j = 0; j < cols; ++j)
 			{
 				matrix[i][j] = i;
-					//rand() % 100;
+				//rand() % 100;
 			}
 		}
 	}
@@ -100,11 +101,7 @@ public:
 
 	~Matrix()
 	{
-		for (int i = 0; i < rows; i++)
-		{
-			delete[] matrix[i];
-		}
-		delete[] matrix;
+		freeDynamic();
 	}
 
 	void print() const {
@@ -115,7 +112,6 @@ public:
 			std::cout << "\n";
 		}
 	}
-
 
 	//addition +=
 	Matrix& operator+=(const Matrix& otherMatrix)
@@ -132,15 +128,7 @@ public:
 			}
 		}
 		return *this;
-	}
-
-	//addition +
-	Matrix operator+(const Matrix& otherMatrix)
-	{
-		Matrix result(*this);
-		result += otherMatrix;
-		return result;
-	}
+	}	
 
 	//substract -=
 	Matrix& operator-=(const Matrix& otherMatrix)
@@ -159,14 +147,6 @@ public:
 		return *this;
 	}
 
-	//substract -
-	Matrix operator-(const Matrix& otherMatrix)
-	{
-		Matrix result(*this);
-		result -= otherMatrix;
-		return result;
-	
-	}
 	//++z
 	Matrix& operator++()
 	{
@@ -219,41 +199,11 @@ public:
 		return *this;
 	}
 
-	//*
-	Matrix operator*(int num) const
-	{
-		Matrix result(*this);
-		result *= num;
-		return result;
-	}
+	
 
-	//==
-	bool operator==(const Matrix& otherMatrix) const
-	{
-		/*if (rows != otherMatrix.rows || cols != otherMatrix.cols) {
-			return false;
-		}*/
-		for (int i = 0; i < rows; i++)
-		{
-			for (int j = 0; j < cols; j++)
-			{
-				if (matrix[i][j] != otherMatrix.matrix[i][j])
-				{
-					return false;
-				}
-			}
-		}
-		return true;
-	}
-
-	//!=
-	bool operator!=(const Matrix& otherMatrix)
-	{
-		return !(*this == otherMatrix);
-	}
 
 	//[]
-	int* operator[](int rowIndex) 
+	int* operator[](int rowIndex)
 	{
 		if (rowIndex < 0 || rowIndex >= rows)
 		{
@@ -262,45 +212,28 @@ public:
 		return matrix[rowIndex];
 	}
 
-	const int* operator[](int rowIndex) const 
+	const int* operator[](int rowIndex) const
 	{
 		if (rowIndex < 0 || rowIndex >= rows)
 		{
 			throw std::out_of_range("Invalid row index");
-		}	
+		}
 		return matrix[rowIndex];
 	}
 
 	//files
 	friend std::ofstream& operator<<(std::ofstream& writeFile, const Matrix& v);
 	friend std::ifstream& operator>>(std::ifstream& readFile, Matrix& v);
-	
-	//operators < > <= =>
-	//to prevent double summing, make ints
-	bool operator<(const Matrix& otherMatrix) const
-	{
-		int sum1 = this->sumElements();
-		int sum2 = otherMatrix.sumElements();
-		return sum1 < sum2;
-	}
-	bool operator>(const Matrix& otherMatrix) const
-	{
-		int sum1 = this->sumElements();
-		int sum2 = otherMatrix.sumElements();
-		return sum1 > sum2;
-	}
-	bool operator<=(const Matrix& otherMatrix) const
-	{
-		int sum1 = this->sumElements();
-		int sum2 = otherMatrix.sumElements();
-		return sum1 <= sum2;
-	}
-	bool operator>=(const Matrix& otherMatrix) const
-	{
-		int sum1 = this->sumElements();
-		int sum2 = otherMatrix.sumElements();
-		return sum1 >= sum2;
-	}
+	friend Matrix operator+(const Matrix&, const Matrix&);
+	friend Matrix operator-(const Matrix&, const Matrix&);
+	friend Matrix operator*(const Matrix&, int);
+	friend Matrix operator*(int, const Matrix&);
+	friend bool operator==(const Matrix&, const Matrix&);
+	friend bool operator!=(const Matrix&, const Matrix&);
+	friend bool operator>=(const Matrix&, const Matrix&);
+	friend bool operator<=(const Matrix&, const Matrix&);
+	friend bool operator>(const Matrix&, const Matrix&);
+	friend bool operator<(const Matrix&, const Matrix&);
 
 	//operator ()
 	Matrix operator()()
@@ -308,14 +241,14 @@ public:
 		Matrix transponed(cols, rows);
 
 		for (int i = 0; i < rows; ++i)
-			{
+		{
 			for (int j = 0; j < cols; ++j)
-				{
-					transponed.matrix[j][i] = matrix[i][j];
-				}
+			{
+				transponed.matrix[j][i] = matrix[i][j];
 			}
-			return transponed;
 		}
+		return transponed;
+	}
 
 	//check if matrix is 0
 	operator bool() const
@@ -337,13 +270,73 @@ public:
 
 
 
+
+//addition +
+Matrix operator+(const Matrix& lhs, const Matrix& rhs)
+{
+	Matrix result(lhs);
+	result += rhs;
+	return result;
+}
+
+//substract -
+Matrix operator-(const Matrix& lhs, const Matrix& rhs)
+{
+	Matrix result(lhs);
+	result -= rhs;
+	return result;
+
+}
+
+//*1
+Matrix operator*(const Matrix& lhs, int num)
+{
+	Matrix result(lhs);
+	result *= num;
+	return result;
+}
+
+//*2
+Matrix operator*(int num, const Matrix& rhs)
+{
+	Matrix result(rhs);
+	result *= num;
+	return result;
+}
+
+//==
+bool operator==(const Matrix& lhs, const Matrix& rhs)
+{
+	if (lhs.rows != rhs.rows || lhs.cols != rhs.cols) {
+		return false;
+	}
+	for (int i = 0; i < lhs.rows; i++)
+	{
+		for (int j = 0; j < lhs.cols; j++)
+		{
+			if (lhs.matrix[i][j] != rhs.matrix[i][j])
+			{
+				return false;
+			}
+		}
+	}
+	return true;
+}
+
+//!=
+bool operator!=(const Matrix& lhs, const Matrix& rhs)
+{
+	return !(lhs == rhs);
+}
+
+
 std::ofstream& operator<<(std::ofstream& writeFile, const Matrix& otherMatrix)
 {
 	writeFile << otherMatrix.rows << " " << otherMatrix.cols;
 
-	for (int i = 0; i < otherMatrix.rows; ++i) 
+	for (int i = 0; i < otherMatrix.rows; ++i)
 	{
-		for (int j = 0; j < otherMatrix.cols; ++j) 
+		for (int j = 0; j < otherMatrix.cols; ++j)
 		{
 			writeFile << otherMatrix.matrix[i][j] << " ";
 		}
@@ -352,9 +345,41 @@ std::ofstream& operator<<(std::ofstream& writeFile, const Matrix& otherMatrix)
 	return writeFile;
 }
 
+
+//operators < > <= =>
+
+
+bool operator<(const Matrix& lhs, const Matrix& rhs)
+{
+	//to prevent double summing, make ints
+	int sum1 = lhs.sumElements();
+	int sum2 = rhs.sumElements();
+	return sum1 < sum2;
+}
+
+bool operator>(const Matrix& lhs, const Matrix& rhs)
+{
+	int sum1 = lhs.sumElements();
+	int sum2 = rhs.sumElements();
+	return sum1 > sum2;
+}
+bool operator<=(const Matrix& lhs, const Matrix& rhs)
+{
+	int sum1 = lhs.sumElements();
+	int sum2 = rhs.sumElements();
+	return sum1 <= sum2;
+}
+bool operator>=(const Matrix& lhs, const Matrix& rhs)
+{
+	int sum1 = lhs.sumElements();
+	int sum2 = rhs.sumElements();
+	return sum1 >= sum2;
+}
+
+
 std::ifstream& operator>>(std::ifstream& readFile, Matrix& otherMatrix)
 {
-	int r,c;
+	int r, c;
 	readFile >> r >> c;
 	otherMatrix.freeDynamic();
 	otherMatrix.rows = r;
@@ -375,25 +400,28 @@ int main() {
 
 	srand(time(0));
 
-	Matrix m1(2,2);
+	Matrix m1(2, 2);
 	Matrix m2(2, 2);
 	Matrix m22(2, 3);
 	Matrix m3(3, 3);
 	Matrix m4(4, 4);
-	try 
-	{	
-		 //m4();
-	
+	try
+	{
+		//m1.print();
+		/*Matrix mSum = m1 + m2;
+		std::cout << "\nSum:\n";
+		mSum.print();*/
+
 	}
 	catch (const std::logic_error& e)
 	{
 		std::cerr << e.what();
 	}
-	catch (const std::out_of_range& e) 
+	catch (const std::out_of_range& e)
 	{
 		std::cerr << e.what();
 	}
-	if (m4) 
+	if (m4)
 	{
 		m4.print();
 	}
@@ -401,5 +429,5 @@ int main() {
 	{
 		std::cout << "hell nah";
 	}
-	
+
 }
