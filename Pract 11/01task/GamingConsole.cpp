@@ -1,22 +1,22 @@
-#include "Laptop.h"
+#include "GamingConsole.h"
 
-Laptop::Laptop() : Computer() {}
+GamingConsole::GamingConsole() : Computer() {}
 
-Laptop::Laptop(double procesorPower, const char* videoCard, int power, int ram)
+GamingConsole::GamingConsole(double procesorPower, const char* videoCard, int power, int ram)
 	:Computer(procesorPower, videoCard, power, ram) {}
 
-void Laptop::describeComputer() const
+void GamingConsole::describeComputer() const
 {
-	std::cout << "This is a Laptop." << std::endl;
+	std::cout << "This is a GamingConsole." << std::endl;
 	Computer::describeComputer();
 }
 
-void Laptop::printComponents() const
+void GamingConsole::printComponents() const
 {
-	static const char* components[] = { "mouse pad", "keyboard", "monitor"};
+	static const char* components[] = { "joystick", "monitor" };
 	const int count = sizeof(components) / sizeof(components[0]);
 
-	std::cout << "Laptop Peripherals:\n";
+	std::cout << "Gaming Console Peripherals:\n";
 	for (int i = 0; i < count; ++i) {
 		std::cout << "- " << components[i] << std::endl;
 	}
