@@ -21,7 +21,13 @@ public:
 	}
 
 	//default ctor
-	Array() = default;
+	Array() 
+		: currSize(0) {
+	for (size_t i = 0; i < Size; ++i)
+		{	 
+			myArray[i] = T();
+		}
+	}
 
 	//we predefine the operator[] for the array we use, to act like one since it's T type
 	T& operator[] (size_t index)
