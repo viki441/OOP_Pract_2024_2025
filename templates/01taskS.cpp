@@ -1,6 +1,9 @@
 #include <iostream>
 #include <stdexcept>
+#include <cstring>
+#pragma warning (disable : 4996)
 
+//task 0
 template <typename T, size_t Size>
 class Array
 {
@@ -23,8 +26,8 @@ public:
 	//default ctor
 	Array() 
 		: currSize(0) {
-	for (size_t i = 0; i < Size; ++i)
-		{	 
+		for (size_t i = 0; i < Size; ++i)
+		{ 
 			myArray[i] = T();
 		}
 	}
@@ -41,12 +44,12 @@ public:
 	}
 
 	//additional
-	size_t getMaxSize()
+	size_t getMaxSize() const
 	{
 		return Size;
 	}
 
-	size_t getSize()
+	size_t getSize() const
 	{
 		return currSize + 1;
 	}
@@ -213,6 +216,31 @@ public:
 	}
 };
 
+//task1
+// Overload 1: Source and dest are raw pointers (or arrays decayed to pointers)
+template<typename T>
+void copyInto(T* dest, const T* source, size_t sizePrevious)
+{
+	for (size_t i = 0; i < sizePrevious; ++i)
+		dest[i] = source[i];
+}
+
+// Overload 2: Source is Array, dest is raw pointer
+template<typename T, size_t Size>
+void copyInto(T* dest, const Array<T, Size>& source, size_t sizePrevious)
+{
+	for (size_t i = 0; i < sizePrevious; ++i)
+		dest[i] = source[i];
+}
+
+// Overload 3: Source is raw pointer, dest is Array
+template<typename T, size_t Size>
+void copyInto(Array<T, Size>& dest, const T* source, size_t sizePrevious)
+{
+	for (size_t i = 0; i < sizePrevious; ++i)
+		dest.pushBack(source[i]);
+}
+
 int main()
 {
 	Array<int, 10> arr;
@@ -233,5 +261,18 @@ int main()
 	arr.popBack();
 	std::cout << "After popBack(), size = " << arr.getSize() << "\n";
 
+
+	std::cout << "Task1 \n";
+	int raw[] = { 1, 2, 3, 4, 5 };
+	Array<int, 10> arr1;
+	copyInto(arr1, raw, 5); // raw → Array
+
+	int destRaw[10];
+	copyInto(destRaw, arr1, 5); // Array → raw
+
+	for (int i = 0; i < 5; ++i)
+		std::cout << destRaw[i] << " ";
+
+	
 
 }
